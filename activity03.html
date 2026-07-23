@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Microeconomics Interactive Activity Prompt Builder</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        econ: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0284c7',
+                            600: '#0369a1',
+                            700: '#035485',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom scrollbars for clean look */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
+
+    <!-- Top Header -->
+    <header class="bg-slate-900 text-white shadow-lg border-b border-slate-800 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-gradient-to-tr from-sky-500 to-indigo-600 p-2.5 rounded-xl text-white shadow-md">
+                    <i class="fa-solid font-bold fa-chart-line text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight tracking-tight">MicroEcon PromptLab</h1>
+                    <p class="text-xs text-sky-400 font-medium">Community College Interactive Activity Architect</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3">
+                <button onclick="loadSamplePreset('elasticity')" class="px-3 py-1.5 text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg border border-slate-700 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-wand-magic-sparkles text-amber-400"></i> Preset: Elasticity Lab
+                </button>
+                <button onclick="loadSamplePreset('gameTheory')" class="px-3 py-1.5 text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg border border-slate-700 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-gamepad text-emerald-400"></i> Preset: Prisoner's Dilemma
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace Grid -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- Left Form Column (Controls & Settings) -->
+        <div class="lg:col-span-6 space-y-6 overflow-y-auto max-h-[calc(100vh-100px)] pr-1">
+
+            <!-- Card 1: Expert Personas -->
+            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm hover:shadow-md transition">
+                <div class="flex items-center justify-between mb-3">
+                    <h2 class="text-sm font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2">
+                        <i class="fa-solid fa-user-gear text-sky-600"></i> 1. Expert Collaborator Personas
+                    </h2>
+                    <span class="text-xs bg-sky-50 text-sky-700 px-2 py-0.5 rounded-full font-semibold">Multi-Select</span>
+                </div>
+                <p class="text-xs text-slate-500 mb-4">Select expert lenses to guide the system prompt instructions:</p>
+                
+                <div class="grid grid-cols-2 gap-2.5" id="persona-container">
+                    <label class="persona-card flex items-start gap-2.5 p-3 rounded-lg border border-slate-200 bg-slate-50/50 hover:bg-sky-50/50 cursor-pointer transition select-none">
+                        <input type="checkbox" id="persona-sme" checked onchange="updatePrompt()" class="mt-1 rounded text-sky-600 focus:ring-sky-500 h-4 w-4">
+                        <div>
+                            <span class="block text-xs font-bold text-slate-800">Economics SME</span>
+                            <span class="block text-[11px] text-slate-500">Rigorous micro theory & intuitive graphs</span>
+                        </div>
+                    </label>
+
+                    <label class="persona-card flex items-start gap-2.5 p-3 rounded-lg border border-slate-200 bg-slate-50/50 hover:bg-sky-50/50 cursor-pointer transition select-none">
+                        <input type="checkbox" id="persona-id" checked onchange="updatePrompt()" class="mt-1 rounded text-sky-600 focus:ring-sky-500 h-4 w-4">
+                        <div>
+                            <span class="block text-xs font-bold text-slate-800">Instructional Designer</span>
+                            <span class="block text-[11px] text-slate-500">Bloom's scaffolding & clear feedback</span>
+                        </div>
+                    </label>
+
+                    <label class="persona-card flex items-start gap-2.5 p-3 rounded-lg border border-slate-200 bg-slate-50/50 hover:bg-sky-50/50 cursor-pointer transition select-none">
+                        <input type="checkbox" id="persona-dev" checked onchange="updatePrompt()" class="mt-1 rounded text-sky-600 focus:ring-sky-500 h-4 w-4">
+                        <div>
+                            <span class="block text-xs font-bold text-slate-800">Web Developer</span>
+                            <span class="block text-[11px] text-slate-500">Clean single-file HTML5/JS app code</span>
+                        </div>
+                    </label>
+
+                    <label class="persona-card flex items-start gap-2.5 p-3 rounded-lg border border-slate-200 bg-slate-50/50 hover:bg-sky-50/50 cursor-pointer transition select-none">
+                        <input type="checkbox" id="persona-ada" checked onchange="updatePrompt()" class="mt-1 rounded text-sky-600 focus:ring-sky-500 h-4 w-4">
+                        <div>
+                            <span class="block text-xs font-bold text-slate-800">ADA / Accessibility Expert</span>
+                            <span class="block text-[11px] text-slate-500">WCAG 2.1 AA, screen-readers & high contrast</span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Card 2: Curriculum Context -->
+            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm hover:shadow-md transition space-y-4">
+                <h2 class="text-sm font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2">
+                    <i class="fa-solid fa-book-open text-sky-600"></i> 2. Academic Topic & Learning Objectives
+                </h2>
+
+                <!-- Core Topic Select -->
+                <div>
+                    <label for="topic-select" class="block text-xs font-semibold text-slate-700 mb-1">Microeconomics Topic</label>
+                    <select id="topic-select" onchange="handleTopicChange()" class="w-full text-xs bg-slate-50 border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-sky-500 focus:outline-none">
+                        <option value="Supply, Demand & Market Equilibrium">Supply, Demand & Market Equilibrium</option>
+                        <option value="Price Elasticity of Demand & Supply" selected>Price Elasticity of Demand & Supply</option>
+                        <option value="Consumer Choice & Marginal Utility">Consumer Choice & Marginal Utility</option>
+                        <option value="Production Costs & Short/Long Run Cost Curves">Production Costs & Cost Curves</option>
+                        <option value="Perfect Competition & Profit Maximization">Perfect Competition & Profit Maximization</option>
+                        <option value="Monopoly & Price Discrimination">Monopoly & Price Discrimination</option>
+                        <option value="Oligopoly & Game Theory (Payoff Matrices)">Oligopoly & Game Theory</option>
+                        <option value="Monopolistic Competition & Product Differentiation">Monopolistic Competition</option>
+                        <option value="Externalities & Market Failures (Pigouvian Taxes)">Externalities & Market Failures</option>
+                        <option value="Public Goods & Common Resources">Public Goods & Common Resources</option>
+                        <option value="Labor Markets & Wage Determination">Labor Markets & Wage Determination</option>
+                        <option value="Government Price Controls (Floors & Ceilings)">Government Price Controls</option>
+                        <option value="CUSTOM">-- Custom Microeconomics Topic --</option>
+                    </select>
+                </div>
+
+                <!-- Custom Topic Input (Hidden by default) -->
+                <div id="custom-topic-container" class="hidden">
+                    <label for="custom-topic-input" class="block text-xs font-semibold text-slate-700 mb-1">Custom Topic Title</label>
+                    <input type="text" id="custom-topic-input" oninput="updatePrompt()" placeholder="e.g., Asymmetric Information & Moral Hazard" class="w-full text-xs border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-sky-500 focus:outline-none">
+                </div>
+
+                <!-- Major Concepts Tags/Input -->
+                <div>
+                    <label for="concepts-input" class="block text-xs font-semibold text-slate-700 mb-1">Major Concepts & Keywords (Comma-separated)</label>
+                    <input type="text" id="concepts-input" oninput="updatePrompt()" value="Elastic vs Inelastic, Total Revenue Test, Midpoint Formula, Determinants of Elasticity" class="w-full text-xs border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-sky-500 focus:outline-none">
+                </div>
+
+                <!-- Learning Objectives -->
+                <div>
+                    <label for="objectives-input" class="block text-xs font-semibold text-slate-700 mb-1">Learning Objectives (Bloom's Taxonomy aligned)</label>
+                    <textarea id="objectives-input" oninput="updatePrompt()" rows="3" class="w-full text-xs border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-sky-500 focus:outline-none leading-relaxed" placeholder="1. Calculate elasticity using midpoint formula&#10;2. Classify goods based on price responsiveness&#10;3. Predict how price changes impact seller revenue">1. Calculate Price Elasticity of Demand using the midpoint method.
+2. Distinguish visually between elastic, inelastic, and unit-elastic demand curves.
+3. Analyze the Total Revenue Test to determine how price changes impact firm revenue.</textarea>
+                </div>
+            </div>
+
+            <!-- Card 3: Select 12 Activity Types -->
+            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm hover:shadow-md transition">
+                <div class="flex items-center justify-between mb-3">
+                    <h2 class="text-sm font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2">
+                        <i class="fa-solid fa-cubes text-sky-600"></i> 3. Interactive Activity Type (12 Options)
+                    </h2>
+                    <span class="text-xs text-slate-400 font-mono">Choose 1</span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-64 overflow-y-auto pr-1" id="activity-types-grid">
+                    <!-- Activity items inserted via JS -->
+                </div>
+            </div>
+
+            <!-- Card 4: Accessibility (ADA) & Color Themes -->
+            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm hover:shadow-md transition space-y-4">
+                <h2 class="text-sm font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2">
+                    <i class="fa-solid fa-universal-access text-sky-600"></i> 4. Accessibility (ADA) & UI Styling
+                </h2>
+
+                <div class="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+                    <label class="flex items-center gap-2 cursor-pointer select-none">
+                        <input type="checkbox" id="ada-required" checked onchange="updatePrompt()" class="rounded text-sky-600 focus:ring-sky-500 h-4 w-4">
+                        <span class="text-xs font-bold text-slate-800">Mandate Strict ADA / WCAG 2.1 AA Compliance</span>
+                    </label>
+                    <div class="grid grid-cols-2 gap-1.5 pl-6 text-[11px] text-slate-600">
+                        <label class="flex items-center gap-1.5"><input type="checkbox" id="ada-sr" checked onchange="updatePrompt()" class="rounded text-sky-600 h-3 w-3"> Screen reader aria-labels</label>
+                        <label class="flex items-center gap-1.5"><input type="checkbox" id="ada-graph-text" checked onchange="updatePrompt()" class="rounded text-sky-600 h-3 w-3"> Text tables for graphs</label>
+                        <label class="flex items-center gap-1.5"><input type="checkbox" id="ada-kbd" checked onchange="updatePrompt()" class="rounded text-sky-600 h-3 w-3"> Full keyboard navigation</label>
+                        <label class="flex items-center gap-1.5"><input type="checkbox" id="ada-contrast" checked onchange="updatePrompt()" class="rounded text-sky-600 h-3 w-3"> 4.5:1 Contrast ratio</label>
+                    </div>
+                </div>
+
+                <!-- Color Scheme -->
+                <div>
+                    <label for="color-scheme" class="block text-xs font-semibold text-slate-700 mb-1">Activity Visual Color Theme</label>
+                    <select id="color-scheme" onchange="updatePrompt()" class="w-full text-xs bg-slate-50 border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-sky-500 focus:outline-none">
+                        <option value="Academic Navy (Deep Navy & Sky Blue - Highly Professional)">Academic Navy (Deep Navy & Sky Blue)</option>
+                        <option value="Emerald Economics (Forest Green & Mint - Growth/Money)">Emerald Economics (Forest Green & Mint)</option>
+                        <option value="High Contrast Charcoal (Charcoal & Crisp White - Maximum Legibility)">High Contrast Charcoal (Maximum Contrast)</option>
+                        <option value="Warm Amber & Slate (University Style Warm Palette)">Warm Amber & Slate (University Warm)</option>
+                        <option value="Indigo Cyber Tech (Modern Vibrant Dark/Light Compatible)">Indigo Cyber Tech (Modern Vibrant)</option>
+                    </select>
+                </div>
+
+                <!-- Math / Technical Depth -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label for="target-level" class="block text-xs font-semibold text-slate-700 mb-1">Target Audience</label>
+                        <select id="target-level" onchange="updatePrompt()" class="w-full text-xs bg-slate-50 border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-sky-500">
+                            <option value="Community College Intro Microeconomics (100-Level)">Community College Intro (100-Level)</option>
+                            <option value="Applied Business Economics (Vocational/Career)">Applied Business Econ</option>
+                            <option value="AP Economics / Honors Level">Honors / AP Economics</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="math-level" class="block text-xs font-semibold text-slate-700 mb-1">Mathematical Level</label>
+                        <select id="math-level" onchange="updatePrompt()" class="w-full text-xs bg-slate-50 border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-sky-500">
+                            <option value="Graphical & Arithmetic (No calculus, simple algebra)">Graphical & Arithmetic</option>
+                            <option value="Qualitative & Conceptual Focus">Conceptual Focus</option>
+                            <option value="Intermediate Algebraic (Equations & Slopes)">Algebraic Focus</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Right Column: Generated Prompt Preview & Testing Area -->
+        <div class="lg:col-span-6 flex flex-col space-y-4">
+
+            <!-- Card: Generated System Prompt Container -->
+            <div class="bg-slate-900 text-slate-100 rounded-xl p-5 shadow-xl border border-slate-800 flex-1 flex flex-col min-h-[500px]">
+                
+                <!-- Output Header -->
+                <div class="flex flex-wrap items-center justify-between pb-3 border-b border-slate-800 gap-2">
+                    <div class="flex items-center space-x-2">
+                        <span class="inline-block w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300">Generated Master System Prompt</h3>
+                    </div>
+                    
+                    <div class="flex items-center space-x-2">
+                        <button onclick="copyPromptToClipboard()" id="copy-btn" class="px-3 py-1.5 bg-sky-600 hover:bg-sky-500 text-white rounded-lg text-xs font-semibold transition flex items-center gap-1.5 shadow">
+                            <i class="fa-solid fa-copy"></i> <span id="copy-btn-text">Copy Prompt</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- LLM Quick Target Shortcuts -->
+                <div class="py-2.5 flex items-center justify-between text-[11px] text-slate-400 border-b border-slate-800/80">
+                    <span>Copy & paste prompt into:</span>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="copyAndNotify('ChatGPT')" class="hover:text-sky-400 transition bg-slate-800 px-2 py-0.5 rounded border border-slate-700">ChatGPT</button>
+                        <button onclick="copyAndNotify('Claude')" class="hover:text-amber-400 transition bg-slate-800 px-2 py-0.5 rounded border border-slate-700">Claude</button>
+                        <button onclick="copyAndNotify('Gemini')" class="hover:text-indigo-400 transition bg-slate-800 px-2 py-0.5 rounded border border-slate-700">Gemini</button>
+                        <button onclick="copyAndNotify('DeepSeek')" class="hover:text-emerald-400 transition bg-slate-800 px-2 py-0.5 rounded border border-slate-700">DeepSeek</button>
+                    </div>
+                </div>
+
+                <!-- Textarea Code Display -->
+                <div class="flex-1 mt-3 relative">
+                    <textarea id="prompt-output" readonly class="w-full h-full min-h-[380px] bg-slate-950 text-slate-200 font-mono text-xs p-4 rounded-lg border border-slate-800 focus:outline-none resize-none leading-relaxed"></textarea>
+                </div>
+
+                <!-- Direct Gemini Live Test Sandbox -->
+                <div class="mt-4 pt-3 border-t border-slate-800">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <span class="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+                                <i class="fa-solid fa-flask text-amber-400"></i> Direct LLM Live Test
+                            </span>
+                            <p class="text-[11px] text-slate-500">Run this prompt immediately using Gemini 3 Flash model</p>
+                        </div>
+                        <button onclick="generateActivitySample()" id="run-gemini-btn" class="px-3.5 py-1.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold text-xs rounded-lg transition shadow flex items-center gap-1.5">
+                            <i class="fa-solid fa-play"></i> Test Prompt with Gemini API
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Modal Sandbox for Generated Web Activity Preview -->
+    <div id="preview-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex flex-col">
+        <div class="bg-slate-900 border-b border-slate-800 px-6 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-desktop text-sky-400"></i>
+                <h3 class="text-sm font-bold text-white" id="modal-title">Live Microeconomics Activity Preview</h3>
+                <span id="modal-status-badge" class="text-xs bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded">Generating HTML...</span>
+            </div>
+            <button onclick="closePreviewModal()" class="text-slate-400 hover:text-white text-lg font-bold">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div class="flex-1 bg-slate-100 relative">
+            <div id="modal-loader" class="absolute inset-0 flex flex-col items-center justify-center bg-slate-900 text-white z-10">
+                <i class="fa-solid fa-circle-notch fa-spin text-4xl text-sky-500 mb-3"></i>
+                <p class="text-sm font-medium">Generating complete interactive HTML5 microeconomics tool...</p>
+                <p class="text-xs text-slate-400 mt-1">Applying ADA rules, interactive JS handlers & styled visuals...</p>
+            </div>
+            <iframe id="activity-iframe" class="w-full h-full border-0"></iframe>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl border border-slate-700 text-xs font-semibold flex items-center gap-2 transform translate-y-20 opacity-0 transition-all duration-300 z-50">
+        <i class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
+        <span id="toast-msg">Prompt copied to clipboard!</span>
+    </div>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        const ACTIVITY_TYPES = [
+            {
+                id: 'graph_simulator',
+                name: '1. Interactive Graphing & Curve Shift Simulator',
+                icon: 'fa-chart-area',
+                desc: 'Drag sliders to shift supply/demand, view equilibrium changes & surplus calculations in real time.'
+            },
+            {
+                id: 'case_study',
+                name: '2. Branching Scenario & Decision-Tree Case Study',
+                icon: 'fa-sitemap',
+                desc: 'Story-based business case where student choices impact firm marginal revenue and costs.'
+            },
+            {
+                id: 'payoff_matrix',
+                name: '3. Game Theory & Payoff Matrix Interactive',
+                icon: 'fa-gamepad',
+                desc: 'Simulate duopoly strategy, prisoner dilemma, Nash equilibrium, and dominant strategies.'
+            },
+            {
+                id: 'calculator_lab',
+                name: '4. Elasticity & Price Point Calculator Tool',
+                icon: 'fa-calculator',
+                desc: 'Calculate point/midpoint elasticity and test total revenue impact interactively.'
+            },
+            {
+                id: 'roleplay_debate',
+                name: '5. Multi-Stakeholder Policy Debate Simulator',
+                icon: 'fa-users',
+                desc: 'Evaluate price ceilings, minimum wage, or tariffs from consumer, worker, and firm perspectives.'
+            },
+            {
+                id: 'cost_curves',
+                name: '6. Production Function & Cost Curve Explorer',
+                icon: 'fa-industry',
+                desc: 'Manipulate fixed/variable inputs to generate Marginal Cost, ATC, and profit maximization points.'
+            },
+            {
+                id: 'myth_buster',
+                name: '7. Economic Fallacy & Myth-Buster Exercise',
+                icon: 'fa-magnifying-glass-chart',
+                desc: 'Deconstruct common fallacies (e.g., "Sunk cost fallacy", "Zero elasticity myth") with live data.'
+            },
+            {
+                id: 'realworld_data',
+                name: '8. Real-World Market Data Investigator',
+                icon: 'fa-newspaper',
+                desc: 'Analyze simulated commodity prices or real inflation figures to classify market conditions.'
+            },
+            {
+                id: 'externality_lab',
+                name: '9. Externality & Pigouvian Tax Policy Sandbox',
+                icon: 'fa-leaf',
+                desc: 'Internalize social costs of pollution or education using taxes, subsidies, and deadweight loss graphs.'
+            },
+            {
+                id: 'gamified_quiz',
+                name: '10. Speed-Challenge Concept & Vocabulary Game',
+                icon: 'fa-trophy',
+                desc: 'Gamified quiz matching micro terminology with instant diagnostic feedback.'
+            },
+            {
+                id: 'flashcard_app',
+                name: '11. Concept Matching & Formula Flashcards',
+                icon: 'fa-layer-group',
+                desc: 'Self-paced review of core micro formulas, definitions, and visual graph triggers.'
+            },
+            {
+                id: 'rubric_generator',
+                name: '12. Peer-Evaluation & Self-Grading Rubric Tool',
+                icon: 'fa-square-check',
+                desc: 'Guided worksheet that helps students evaluate micro economic argument quality.'
+            }
+        ];
+
+        let selectedActivityId = 'graph_simulator';
+
+        window.onload = function() {
+            renderActivityTypesGrid();
+            updatePrompt();
+        };
+
+        function renderActivityTypesGrid() {
+            const container = document.getElementById('activity-types-grid');
+            if (!container) return;
+            container.innerHTML = ACTIVITY_TYPES.map(act => `
+                <label onclick="selectActivity('${act.id}')" class="activity-card flex items-start gap-2.5 p-3 rounded-lg border ${act.id === selectedActivityId ? 'border-sky-500 bg-sky-50/70 ring-1 ring-sky-500' : 'border-slate-200 bg-slate-50/50 hover:bg-slate-100'} cursor-pointer transition select-none">
+                    <input type="radio" name="activity_type" value="${act.id}" ${act.id === selectedActivityId ? 'checked' : ''} class="mt-1 text-sky-600 focus:ring-sky-500 h-4 w-4">
+                    <div class="flex-1">
+                        <span class="block text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                            <i class="fa-solid ${act.icon} text-sky-600"></i> ${act.name}
+                        </span>
+                        <span class="block text-[11px] text-slate-500 mt-0.5 leading-snug">${act.desc}</span>
+                    </div>
+                </label>
+            `).join('');
+        }
+
+        function selectActivity(id) {
+            selectedActivityId = id;
+            renderActivityTypesGrid();
+            updatePrompt();
+        }
+
+        function handleTopicChange() {
+            const val = document.getElementById('topic-select').value;
+            const customContainer = document.getElementById('custom-topic-container');
+            if (val === 'CUSTOM') {
+                customContainer.classList.remove('hidden');
+            } else {
+                customContainer.classList.add('hidden');
+            }
+            updatePrompt();
+        }
+
+        function generateMasterPrompt() {
+            const sme = document.getElementById('persona-sme').checked;
+            const id = document.getElementById('persona-id').checked;
+            const dev = document.getElementById('persona-dev').checked;
+            const ada = document.getElementById('persona-ada').checked;
+
+            let topicVal = document.getElementById('topic-select').value;
+            if (topicVal === 'CUSTOM') {
+                topicVal = document.getElementById('custom-topic-input').value.trim() || 'Custom Microeconomics Topic';
+            }
+
+            const concepts = document.getElementById('concepts-input').value.trim();
+            const objectives = document.getElementById('objectives-input').value.trim();
+            const colorScheme = document.getElementById('color-scheme').value;
+            const targetLevel = document.getElementById('target-level').value;
+            const mathLevel = document.getElementById('math-level').value;
+            const isAdaRequired = document.getElementById('ada-required').checked;
+
+            const selectedActObj = ACTIVITY_TYPES.find(a => a.id === selectedActivityId) || ACTIVITY_TYPES[0];
+
+            // Construct personas list
+            const activePersonas = [];
+            if (sme) activePersonas.push("Subject Matter Expert (Microeconomics Community College Professor)");
+            if (id) activePersonas.push("Senior Instructional Designer (Active Learning & Bloom's Taxonomy)");
+            if (dev) activePersonas.push("Expert Frontend Web Developer (Single-file HTML5/JS/Tailwind CSS)");
+            if (ada) activePersonas.push("ADA & Universal Design Accessibility Expert (WCAG 2.1 AA)");
+
+            const adaRules = isAdaRequired ? `
+=== MANDATORY ADA & ACCESSIBILITY REQUIREMENTS (WCAG 2.1 AA) ===
+1. Use semantic HTML5 markup (<main>, <header>, <section>, <nav>, <button>, <label>).
+2. All interactive graphs or visual canvases MUST have a visible tabular alternative or dynamic text summary for screen reader users (using aria-live="polite").
+3. Color Contrast: Maintain a minimum contrast ratio of 4.5:1 for text. Color must NOT be the sole indicator of economic shifts (e.g., use shapes/dotted lines alongside red/green colors).
+4. Keyboard Accessibility: All buttons, sliders, and form inputs must be fully accessible via standard keyboard navigation (Tab / Arrow keys). Include explicit focus state outlines.
+5. All icon buttons must have 'aria-label' attributes.
+` : ``;
+
+            // Note: Safely escaping closing script tags in JS string template
+            return `Act as a collaborative expert team consisting of:
+${activePersonas.map(p => `- ${p}`).join('\n')}
+
+=== GOAL ===
+Create a fully functional, self-contained interactive web application activity for a Community College Microeconomics course. The final output MUST be a single runnable HTML5 file containing all necessary HTML, CSS (using Tailwind CSS via CDN), and vanilla JavaScript.
+
+=== COURSE CONTEXT & TARGET AUDIENCE ===
+- Target Level: ${targetLevel}
+- Mathematical Depth: ${mathLevel}
+- Topic: ${topicVal}
+- Major Concepts: ${concepts}
+
+=== LEARNING OBJECTIVES ===
+Students will be able to:
+${objectives}
+
+=== ACTIVITY SPECIFICATIONS ===
+- Activity Type: ${selectedActObj.name}
+- Activity Focus: ${selectedActObj.desc}
+- Visual Design Palette: ${colorScheme}
+
+=== INSTRUCTIONAL & FUNCTIONAL DESIGN RULES ===
+1. Self-Contained App: Output ONLY complete HTML code. Use Tailwind CSS CDN (<script src="https://cdn.tailwindcss.com"><\/script>) and vanilla JS. Do NOT use external frameworks or relative asset links.
+2. Active Learning Feedback: Every student interaction (slider movement, radio choice, calculation input) must immediately display actionable pedagogical feedback explaining the underlying economic theory.
+3. Microeconomic Rigor: Ensure numerical examples are mathematically precise, economically logical, and intuitive for introductory community college students.
+4. Clean Visual UI: Use rounded borders, modern typography, card-based layout, clear headings, and intuitive control panels.
+${adaRules}
+=== DELIVERABLE FORMAT ===
+Generate the complete HTML code starting with <!DOCTYPE html> wrapped inside a markdown code block. Include clear inline comments explaining economic calculations and instructional feedback loops.`;
+        }
+
+        function updatePrompt() {
+            const promptText = generateMasterPrompt();
+            const outputElem = document.getElementById('prompt-output');
+            if (outputElem) {
+                outputElem.value = promptText;
+            }
+        }
+
+        function copyPromptToClipboard() {
+            const text = document.getElementById('prompt-output').value;
+            
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text).then(() => showToast("Master prompt copied to clipboard!"));
+            } else {
+                // Fallback for non-https/iframe contexts
+                const textarea = document.getElementById('prompt-output');
+                textarea.select();
+                try {
+                    document.execCommand('copy');
+                    showToast("Master prompt copied to clipboard!");
+                } catch (err) {
+                    showToast("Failed to copy automatically. Please copy manually.");
+                }
+            }
+        }
+
+        function copyAndNotify(llmName) {
+            copyPromptToClipboard();
+            showToast(`Prompt copied! Ready to paste into ${llmName}.`);
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = message;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        function loadSamplePreset(type) {
+            if (type === 'elasticity') {
+                document.getElementById('topic-select').value = 'Price Elasticity of Demand & Supply';
+                handleTopicChange();
+                document.getElementById('concepts-input').value = 'Elastic vs Inelastic, Midpoint Method, Total Revenue Test, Luxury vs Necessity';
+                document.getElementById('objectives-input').value = `1. Calculate Price Elasticity of Demand using price and quantity changes.\n2. Classify elasticity coefficients (Elastic > 1, Inelastic < 1, Unit Elastic = 1).\n3. Demonstrate how price increases affect Total Revenue under inelastic demand.`;
+                selectActivity('calculator_lab');
+            } else if (type === 'gameTheory') {
+                document.getElementById('topic-select').value = 'Oligopoly & Game Theory (Payoff Matrices)';
+                handleTopicChange();
+                document.getElementById('concepts-input').value = 'Dominant Strategy, Nash Equilibrium, Collusion, Prisoner Dilemma, Cartels';
+                document.getElementById('objectives-input').value = `1. Identify dominant strategies for both firms in a 2x2 payoff matrix.\n2. Locate the Nash Equilibrium in price-setting duopoly scenarios.\n3. Explain why self-interest leads to sub-optimal outcomes without legal enforcement.`;
+                selectActivity('payoff_matrix');
+            }
+        }
+
+        async function generateActivitySample() {
+            const promptText = document.getElementById('prompt-output').value;
+            const modal = document.getElementById('preview-modal');
+            const loader = document.getElementById('modal-loader');
+            const iframe = document.getElementById('activity-iframe');
+            const badge = document.getElementById('modal-status-badge');
+
+            modal.classList.remove('hidden');
+            loader.classList.remove('hidden');
+            badge.innerText = "Generating HTML via Gemini API...";
+            badge.className = "text-xs bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded";
+
+            // Prompt payload configuration
+            const systemPrompt = "You are an expert web developer and microeconomics instructor. Output ONLY raw HTML code wrapped in ```html markdown tag.";
+            const apiKey = "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+            const payload = {
+                contents: [{ parts: [{ text: promptText }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] }
+            };
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                const candidate = result.candidates?.[0];
+                const rawText = candidate?.content?.parts?.[0]?.text || "";
+
+                // Extract HTML content from markdown block if present
+                let cleanHtml = rawText;
+                const matches = rawText.match(/```html([\s\S]*?)```/);
+                if (matches && matches[1]) {
+                    cleanHtml = matches[1].trim();
+                } else if (rawText.includes("```")) {
+                    cleanHtml = rawText.replace(/```/g, "").trim();
+                }
+
+                if (!cleanHtml) {
+                    cleanHtml = `<div style="font-family:sans-serif; padding: 2rem; color: #7f1d1d; background: #fef2f2; border-radius: 8px;"><h3>Generation Error</h3><p>Could not extract HTML content from Gemini API response.</p></div>`;
+                }
+
+                // Render into iframe safely
+                const blob = new Blob([cleanHtml], { type: 'text/html' });
+                iframe.src = URL.createObjectURL(blob);
+
+                loader.classList.add('hidden');
+                badge.innerText = "Live Preview Active";
+                badge.className = "text-xs bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded";
+
+            } catch (err) {
+                console.error(err);
+                loader.classList.add('hidden');
+                iframe.srcdoc = `<div style="font-family:sans-serif; padding:2rem; color:red;">Error contacting Gemini API: ${err.message}</div>`;
+                badge.innerText = "Error";
+                badge.className = "text-xs bg-red-500/20 text-red-300 border border-red-500/30 px-2 py-0.5 rounded";
+            }
+        }
+
+        function closePreviewModal() {
+            document.getElementById('preview-modal').classList.add('hidden');
+            document.getElementById('activity-iframe').src = "about:blank";
+        }
+    </script>
+</body>
+</html>
