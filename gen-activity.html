@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IPv6 Compression: A Step-by-Step Tutorial</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --user-primary: #1a4480;
+    --user-accent: #c8102e;
+    --user-background: #ffffff;
+
+    --ink: #1b1f27;
+    --ink-soft: #4a5568;
+    --panel: #f2f5fa;
+    --panel-line: #d7e0ec;
+    --success: #1e6b3e;
+    --success-bg: #e7f4ec;
+    --error-bg: #fbe9ea;
+    --focus-ring: #0b5fff;
+
+    --font-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+    --font-mono: "IBM Plex Mono", "Courier New", monospace;
+
+    --radius: 10px;
+  }
+
+  body.dyslexia-mode {
+    --font-body: "OpenDyslexic", "Atkinson Hyperlegible", "Comic Sans MS", sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    font-family: var(--font-body);
+    background: var(--user-background);
+    color: var(--ink);
+    line-height: 1.6;
+    font-size: 1.05rem;
+  }
+
+  a { color: var(--user-primary); }
+
+  .skip-link {
+    position: absolute;
+    left: -999px;
+    top: auto;
+    background: var(--user-primary);
+    color: #fff;
+    padding: 0.75rem 1rem;
+    z-index: 100;
+    border-radius: 0 0 8px 0;
+  }
+  .skip-link:focus {
+    left: 0;
+    top: 0;
+  }
+
+  /* ---------- Header ---------- */
+  header.site-header {
+    background: var(--user-primary);
+    color: #fff;
+    padding: 1.25rem 1rem;
+  }
+  .header-inner {
+    max-width: 960px;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .header-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .header-title .badge {
+    background: var(--user-accent);
+    color: #fff;
+    font-family: var(--font-mono);
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 0.3rem 0.55rem;
+    border-radius: 6px;
+    letter-spacing: 0.03em;
+  }
+  h1 {
+    font-size: 1.4rem;
+    margin: 0;
+  }
+  .subtitle {
+    margin: 0.15rem 0 0;
+    font-size: 0.95rem;
+    color: #dbe6f5;
+  }
+
+  .display-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255,255,255,0.12);
+    padding: 0.4rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.9rem;
+  }
+  .display-toggle input {
+    width: 2.4rem;
+    height: 1.3rem;
+    appearance: none;
+    background: rgba(255,255,255,0.35);
+    border-radius: 999px;
+    position: relative;
+    cursor: pointer;
+    outline-offset: 3px;
+  }
+  .display-toggle input::before {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 1.05rem;
+    height: 1.05rem;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.15s ease;
+  }
+  .display-toggle input:checked {
+    background: var(--user-accent);
+  }
+  .display-toggle input:checked::before {
+    transform: translateX(1.1rem);
+  }
+
+  /* ---------- Progress ---------- */
+  nav.progress-nav {
+    background: var(--panel);
+    border-bottom: 1px solid var(--panel-line);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .progress-inner {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0.6rem 1rem;
+    overflow-x: auto;
+  }
+  .progress-list {
+    list-style: none;
+    display: flex;
+    gap: 0.4rem;
+    margin: 0;
+    padding: 0;
+    min-width: max-content;
+  }
+  .progress-list li {
+    display: flex;
+    align-items: center;
+  }
+  .progress-list button {
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    border: 1px solid var(--panel-line);
+    background: #fff;
+    color: var(--ink-soft);
+    padding: 0.4rem 0.7rem;
+    border-radius: 999px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .progress-list button[aria-current="step"] {
+    background: var(--user-primary);
+    color: #fff;
+    border-color: var(--user-primary);
+    font-weight: 700;
+  }
+  .progress-list button.completed {
+    border-color: var(--success);
+    color: var(--success);
+  }
+  .progress-list button:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  a:focus-visible,
+  [tabindex]:focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+
+  /* ---------- Main layout ---------- */
+  main {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 2rem 1rem 4rem;
+  }
+
+  .step {
+    display: none;
+    animation: fadeIn 0.25s ease;
+  }
+  .step.active { display: block; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--user-accent);
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+  }
+
+  h2 {
+    color: var(--user-primary);
+    font-size: 1.6rem;
+    margin: 0 0 0.75rem;
+  }
+  h3 {
+    color: var(--ink);
+    font-size: 1.15rem;
+    margin: 1.5rem 0 0.5rem;
+  }
+
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--panel-line);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    margin: 1.25rem 0;
+  }
+
+  .objectives-list {
+    padding-left: 1.2rem;
+    margin: 0;
+  }
+  .objectives-list li { margin-bottom: 0.4rem; }
+
+  .addr {
+    font-family: var(--font-mono);
+    background: #fff;
+    border: 1px solid var(--panel-line);
+    border-radius: 6px;
+    padding: 0.6rem 0.8rem;
+    display: inline-block;
+    font-size: 1.05rem;
+    letter-spacing: 0.02em;
+    word-break: break-all;
+  }
+
+  .addr .grp { padding: 0 1px; border-radius: 3px; }
+  .addr .grp.zero-run { background: #fde3e6; color: var(--user-accent); font-weight: 700; }
+  .addr .grp.leading-zero { text-decoration: underline wavy var(--user-accent); text-decoration-thickness: 1.5px; }
+  .addr .colon-collapsed { color: var(--user-accent); font-weight: 700; }
+
+  /* ---------- Signature compression press ---------- */
+  .press {
+    background: #fff;
+    border: 2px dashed var(--panel-line);
+    border-radius: var(--radius);
+    padding: 1.5rem 1rem;
+    text-align: center;
+    margin: 1.25rem 0;
+  }
+  .press-stage {
+    font-family: var(--font-mono);
+    font-size: 1.15rem;
+    min-height: 2.6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.15rem;
+    transition: gap 0.3s ease;
+  }
+  .press-stage span.fold {
+    transition: all 0.35s ease;
+  }
+  .press-stage span.fold.squeezed {
+    display: inline-block;
+    max-width: 0;
+    opacity: 0;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+  }
+  .press button.press-btn {
+    margin-top: 1rem;
+  }
+  .press-caption {
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+    margin-top: 0.5rem;
+    min-height: 1.2rem;
+  }
+
+  /* ---------- Buttons ---------- */
+  button {
+    font-family: var(--font-body);
+    cursor: pointer;
+  }
+  .btn {
+    background: var(--user-primary);
+    color: #fff;
+    border: none;
+    padding: 0.65rem 1.2rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+  .btn:hover { background: #143563; }
+  .btn.secondary {
+    background: #fff;
+    color: var(--user-primary);
+    border: 2px solid var(--user-primary);
+  }
+  .btn.secondary:hover { background: var(--panel); }
+  .btn.accent {
+    background: var(--user-accent);
+  }
+  .btn.accent:hover { background: #a30d24; }
+  .btn:disabled {
+    background: #b7c2d1;
+    color: #fff;
+    cursor: not-allowed;
+  }
+
+  .nav-row {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2.5rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  /* ---------- Practice / quiz ---------- */
+  .practice-item {
+    background: var(--panel);
+    border: 1px solid var(--panel-line);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    margin: 1rem 0;
+  }
+  .practice-item label {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+  .practice-item input[type="text"] {
+    font-family: var(--font-mono);
+    font-size: 1rem;
+    width: 100%;
+    max-width: 420px;
+    padding: 0.55rem 0.7rem;
+    border: 2px solid var(--panel-line);
+    border-radius: 6px;
+  }
+  .practice-item input[type="text"]:focus {
+    border-color: var(--user-primary);
+  }
+  .practice-controls {
+    display: flex;
+    gap: 0.6rem;
+    margin-top: 0.75rem;
+    flex-wrap: wrap;
+  }
+  .feedback {
+    margin-top: 0.75rem;
+    padding: 0.6rem 0.8rem;
+    border-radius: 6px;
+    font-weight: 600;
+    display: none;
+  }
+  .feedback.show { display: block; }
+  .feedback.correct { background: var(--success-bg); color: var(--success); }
+  .feedback.incorrect { background: var(--error-bg); color: var(--user-accent); }
+
+  fieldset {
+    border: none;
+    padding: 0;
+    margin: 0;
+  }
+  fieldset legend {
+    font-weight: 700;
+    margin-bottom: 0.6rem;
+    padding: 0;
+  }
+  .mc-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.55rem;
+    background: #fff;
+    border: 2px solid var(--panel-line);
+    border-radius: 8px;
+    padding: 0.6rem 0.75rem;
+    margin-bottom: 0.55rem;
+    cursor: pointer;
+  }
+  .mc-option:has(input:checked) {
+    border-color: var(--user-primary);
+    background: #eaf1fb;
+  }
+  .mc-option input { margin-top: 0.2rem; }
+
+  .pitfall {
+    border-left: 4px solid var(--user-accent);
+    background: #fff6f6;
+    padding: 0.9rem 1rem;
+    border-radius: 0 8px 8px 0;
+    margin: 1rem 0;
+  }
+  .pitfall strong { color: var(--user-accent); }
+
+  .media-note {
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+    font-style: italic;
+    border-top: 1px dashed var(--panel-line);
+    padding-top: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  table.rule-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 0.95rem;
+  }
+  table.rule-table th, table.rule-table td {
+    border: 1px solid var(--panel-line);
+    padding: 0.55rem 0.7rem;
+    text-align: left;
+  }
+  table.rule-table th {
+    background: var(--user-primary);
+    color: #fff;
+  }
+  table.rule-table td.mono, table.rule-table th.mono { font-family: var(--font-mono); }
+
+  .sr-only {
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap; border: 0;
+  }
+
+  .final-score {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--user-primary);
+  }
+
+  @media (max-width: 600px) {
+    h2 { font-size: 1.35rem; }
+    .header-inner { flex-direction: column; align-items: flex-start; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#main-content">Skip to tutorial content</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="header-title">
+      <span class="badge" aria-hidden="true">::</span>
+      <div>
+        <h1>IPv6 Compression</h1>
+        <p class="subtitle">A step-by-step tutorial</p>
+      </div>
+    </div>
+    <label class="display-toggle" for="dyslexia-toggle">
+      <span>Easy-read font</span>
+      <input type="checkbox" id="dyslexia-toggle" aria-describedby="dyslexia-desc">
+    </label>
+    <span id="dyslexia-desc" class="sr-only">Turns on a font designed to be easier to read for people with dyslexia.</span>
+  </div>
+</header>
+
+<nav class="progress-nav" aria-label="Tutorial steps">
+  <div class="progress-inner">
+    <ol class="progress-list" id="progress-list"></ol>
+  </div>
+</nav>
+
+<main id="main-content">
+
+  <!-- STEP 1: Objectives / Intro -->
+  <section class="step active" id="step-1" data-step="1" aria-labelledby="step-1-title">
+    <p class="eyebrow">Step 1 of 7 · Get started</p>
+    <h2 id="step-1-title">Why do IPv6 addresses get shortened?</h2>
+    <p>An IPv6 address is a 128-bit number. To make it easier for people to read, we write it as
+      <strong>8 groups</strong> of 4 hexadecimal (base-16) digits, separated by colons. Here is one:</p>
+    <p class="addr">2001:0db8:0000:0000:0000:ff00:0042:8329</p>
+    <p>That is long and hard to type. So there are two simple rules that let us write the same address in a
+      shorter form. This tutorial teaches you both rules and lets you practice using them.</p>
+
+    <div class="card">
+      <h3 style="margin-top:0;">What you will be able to do</h3>
+      <p style="margin-top:0; color:var(--ink-soft); font-size:0.95rem;">By the end of this tutorial, you will be able to:</p>
+      <ul class="objectives-list">
+        <li><strong>Remember</strong> the two rules used to compress an IPv6 address.</li>
+        <li><strong>Understand</strong> why an address can only use the double-colon (<code>::</code>) shortcut one time.</li>
+        <li><strong>Apply</strong> both rules to compress a full address, and expand a compressed one back to full form.</li>
+      </ul>
+    </div>
+
+    <p class="media-note">Note for instructors: if this lesson is adapted to include narrated video or audio, captions or a transcript must be provided.</p>
+
+    <div class="nav-row">
+      <span></span>
+      <button class="btn" data-nav="next">Start learning <span aria-hidden="true">&rarr;</span></button>
+    </div>
+  </section>
+
+  <!-- STEP 2: Rule 1 -->
+  <section class="step" id="step-2" data-step="2" aria-labelledby="step-2-title">
+    <p class="eyebrow">Step 2 of 7 · Rule 1</p>
+    <h2 id="step-2-title">Rule 1: Drop the leading zeros in each group</h2>
+    <p>Each group has 4 hex digits. If a group starts with one or more zeros, you can drop those zeros.
+      A <strong>leading zero</strong> is a zero at the start of the group, before any other digit.</p>
+
+    <table class="rule-table">
+      <caption class="sr-only">Examples of dropping leading zeros in a group</caption>
+      <thead>
+        <tr><th scope="col">Full group</th><th scope="col">Short form</th><th scope="col">Why</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="mono">0db8</td><td class="mono">db8</td><td>Drop the one leading zero.</td></tr>
+        <tr><td class="mono">0000</td><td class="mono">0</td><td>Drop leading zeros, but keep one digit. A group can never disappear on its own here — it becomes a single "0".</td></tr>
+        <tr><td class="mono">0042</td><td class="mono">42</td><td>Drop both leading zeros.</td></tr>
+        <tr><td class="mono">8329</td><td class="mono">8329</td><td>No leading zero, so nothing changes.</td></tr>
+      </tbody>
+    </table>
+
+    <div class="pitfall">
+      <strong>Common mistake:</strong> Do not drop zeros from the <em>middle</em> or <em>end</em> of a group.
+      The group <span class="addr" style="padding:0.1rem 0.4rem;">2010</span> stays exactly as
+      <span class="addr" style="padding:0.1rem 0.4rem;">2010</span>. Only zeros at the very start of the group can go.
+    </div>
+
+    <div class="nav-row">
+      <button class="btn secondary" data-nav="prev"><span aria-hidden="true">&larr;</span> Back</button>
+      <button class="btn" data-nav="next">Next: Rule 2 <span aria-hidden="true">&rarr;</span></button>
+    </div>
+  </section>
+
+  <!-- STEP 3: Rule 2 -->
+  <section class="step" id="step-3" data-step="3" aria-labelledby="step-3-title">
+    <p class="eyebrow">Step 3 of 7 · Rule 2</p>
+    <h2 id="step-3-title">Rule 2: Replace one run of all-zero groups with "::"</h2>
+    <p>Sometimes several groups in a row are <strong>all zeros</strong> (like <code>0000:0000:0000</code>).
+      When that happens, you can replace that whole run with a double colon: <code>::</code></p>
+
+    <p class="addr">2001:db8<span class="colon-collapsed">::</span>ff00:42:8329</p>
+    <p>The <code>::</code> above stands in for three groups that were all zero. It is a placeholder that means
+      "fill in enough zero groups here to make 8 groups total."</p>
+
+    <h3>The one big limit</h3>
+    <p>You can only use <code>::</code> <strong>one time</strong> in an address. If you used it twice, no one
+      could tell how many zero groups each <code>::</code> represents, and the address would be ambiguous
+      (it could mean more than one thing).</p>
+
+    <div class="pitfall">
+      <strong>Common mistake:</strong> Writing <code>2001::db8::42</code> is <strong>not valid</strong>.
+      There are two <code>::</code> symbols, and a computer cannot know how many zero groups belong to each one.
+    </div>
+
+    <div class="pitfall">
+      <strong>Good to know (advanced note):</strong> If an address has two separate runs of zero groups that
+      are the <em>same length</em>, the standard way to write it (RFC 5952) is to compress the
+      <strong>leftmost</strong> run and write the other one out in full.
+    </div>
+
+    <div class="nav-row">
+      <button class="btn secondary" data-nav="prev"><span aria-hidden="true">&larr;</span> Back</button>
+      <button class="btn" data-nav="next">Next: Worked example <span aria-hidden="true">&rarr;</span></button>
+    </div>
+  </section>
+
+  <!-- STEP 4: Worked example (signature interactive) -->
+  <section class="step" id="step-4" data-step="4" aria-labelledby="step-4-title">
+    <p class="eyebrow">Step 4 of 7 · Worked example</p>
+    <h2 id="step-4-title">Watch a full address get compressed</h2>
+    <p>Here is the address from Step 1. Press the button to compress it one step at a time. Read the
+      reasoning under each press.</p>
+
+    <div class="press">
+      <div class="press-stage" id="press-stage" aria-hidden="true"></div>
+      <p class="press-caption" id="press-caption" role="status" aria-live="polite">Press "Compress it" to begin.</p>
+      <div>
+        <button class="btn accent press-btn" id="press-btn" type="button">Compress it</button>
+        <button class="btn secondary press-btn" id="press-reset-btn" type="button">Start over</button>
+      </div>
+    </div>
+
+    <div class="card" id="reasoning-card">
+      <h3 style="margin-top:0;">Reasoning, spelled out</h3>
+      <ol id="reasoning-list" style="padding-left:1.2rem; margin:0;">
+        <li><strong>Start:</strong> <span class="addr">2001:0db8:0000:0000:0000:ff00:0042:8329</span></li>
+        <li><strong>Apply Rule 1</strong> (drop leading zeros in each group): <code>0db8 → db8</code>,
+          each <code>0000 → 0</code>, <code>0042 → 42</code>. Result:
+          <span class="addr">2001:db8:0:0:0:ff00:42:8329</span></li>
+        <li><strong>Find the longest run of all-zero groups.</strong> Groups 3, 4, and 5 are all
+          <code>0</code> — that is a run of 3.</li>
+        <li><strong>Apply Rule 2</strong> (replace that run with <code>::</code>):
+          <span class="addr">2001:db8<span class="colon-collapsed">::</span>ff00:42:8329</span></li>
+        <li><strong>Check:</strong> Counting <code>::</code> as the missing 3 groups, we still have 8
+          groups total. The compression is valid.</li>
+      </ol>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn secondary" data-nav="prev"><span aria-hidden="true">&larr;</span> Back</button>
+      <button class="btn" data-nav="next">Next: Try one yourself <span aria-hidden="true">&rarr;</span></button>
+    </div>
+  </section>
+
+  <!-- STEP 5: Guided practice -->
+  <section class="step" id="step-5" data-step="5" aria-labelledby="step-5-title">
+    <p class="eyebrow">Step 5 of 7 · Your turn</p>
+    <h2 id="step-5-title">Practice: compress this address</h2>
+    <p>Use both rules from Steps 2 and 3. Type your answer in lower case, using digits and colons only.</p>
+
+    <div class="practice-item">
+      <label for="practice1-input">Compress this address:
+        <span class="addr">ff02:0000:0000:0000:0000:0000:0000:0001</span>
+      </label>
+      <input type="text" id="practice1-input" autocomplete="off" spellcheck="false"
+             aria-describedby="practice1-hint">
+      <p id="practice1-hint" class="media-note" style="margin-top:0.4rem;">
+        Hint: every group here is zero, except the last one.</p>
+      <div class="practice-controls">
+        <button class="btn" data-check="practice1">Check my answer</button>
+        <button class="btn secondary" data-hint-toggle="practice1-solution">Show reasoning</button>
+      </div>
+      <p class="feedback" id="practice1-feedback" role="status" aria-live="polite"></p>
+      <div class="card" id="practice1-solution" style="display:none; margin-top:0.75rem;">
+        <p style="margin:0;"><strong>Reasoning:</strong> All 8 groups are zero except the last group,
+          which is <code>0001 → 1</code> after Rule 1. Since every remaining group is zero and they are
+          all in one run, Rule 2 replaces the whole run with <code>::</code>. Answer:
+          <span class="addr">ff02::1</span></p>
+      </div>
+    </div>
+
+    <div class="practice-item">
+      <label for="practice2-input">Now try this one:
+        <span class="addr">2001:0000:0000:0034:0000:0000:0000:0059</span>
+      </label>
+      <input type="text" id="practice2-input" autocomplete="off" spellcheck="false"
+             aria-describedby="practice2-hint">
+      <p id="practice2-hint" class="media-note" style="margin-top:0.4rem;">
+        Hint: there are two separate runs of zero groups here. Only the longest one gets the <code>::</code>.</p>
+      <div class="practice-controls">
+        <button class="btn" data-check="practice2">Check my answer</button>
+        <button class="btn secondary" data-hint-toggle="practice2-solution">Show reasoning</button>
+      </div>
+      <p class="feedback" id="practice2-feedback" role="status" aria-live="polite"></p>
+      <div class="card" id="practice2-solution" style="display:none; margin-top:0.75rem;">
+        <p style="margin:0;"><strong>Reasoning:</strong> After Rule 1: <code>2001:0:0:34:0:0:0:59</code>.
+          There are two zero-group runs: groups 2–3 (length 2) and groups 5–7 (length 3). The second run
+          is longer, so it gets the <code>::</code>. The shorter run is written out in full. Answer:
+          <span class="addr">2001:0:0:34::59</span></p>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn secondary" data-nav="prev"><span aria-hidden="true">&larr;</span> Back</button>
+      <button class="btn" data-nav="next">Next: Common pitfalls <span aria-hidden="true">&rarr;</span></button>
+    </div>
+  </section>
+
+  <!-- STEP 6: Pitfalls / expand practice -->
+  <section class="step" id="step-6" data-step="6" aria-labelledby="step-6-title">
+    <p class="eyebrow">Step 6 of 7 · Going the other way</p>
+    <h2 id="step-6-title">Expanding a compressed address</h2>
+    <p>You should also be able to go backward: take a short address and write out the full 8-group form.
+      To do this, count how many groups are already written, then figure out how many <code>0</code> groups
+      the <code>::</code> must stand for so the total is 8.</p>
+
+    <div class="practice-item">
+      <label for="practice3-input">Expand this address to its full 8-group form:
+        <span class="addr">2001:db8::1</span>
+      </label>
+      <input type="text" id="practice3-input" autocomplete="off" spellcheck="false"
+             aria-describedby="practice3-hint">
+      <p id="practice3-hint" class="media-note" style="margin-top:0.4rem;">
+        Hint: 3 groups are shown. The <code>::</code> must represent 5 groups of zeros. Write each zero
+        group as <code>0000</code> in your expanded answer.</p>
+      <div class="practice-controls">
+        <button class="btn" data-check="practice3">Check my answer</button>
+        <button class="btn secondary" data-hint-toggle="practice3-solution">Show reasoning</button>
+      </div>
+      <p class="feedback" id="practice3-feedback" role="status" aria-live="polite"></p>
+      <div class="card" id="practice3-solution" style="display:none; margin-top:0.75rem;">
+        <p style="margin:0;"><strong>Reasoning:</strong> <code>2001</code>, <code>db8</code>, and
+          <code>1</code> are 3 groups. 8 minus 3 leaves 5 missing groups, all zero. Each group is padded
+          back to 4 digits. Answer:
+          <span class="addr">2001:0db8:0000:0000:0000:0000:0000:0001</span></p>
+      </div>
+    </div>
+
+    <h3>Pitfalls to remember</h3>
+    <div class="pitfall">
+      <strong>Mistake 1:</strong> Using <code>::</code> more than once in the same address. This is never
+      allowed, even if it looks like it would save space.
+    </div>
+    <div class="pitfall">
+      <strong>Mistake 2:</strong> Using <code>::</code> to replace a run of just <strong>one</strong> zero
+      group when it does not help. It is allowed, but the accepted style (RFC 5952) is to only use
+      <code>::</code> for the longest run, and to prefer leaving a single zero group as <code>0</code>
+      when no run is longer than one group.
+    </div>
+    <div class="pitfall">
+      <strong>Mistake 3:</strong> Forgetting that leading zeros can be dropped from every group first, not
+      just the ones near the <code>::</code>.
+    </div>
+
+    <div class="nav-row">
+      <button class="btn secondary" data-nav="prev"><span aria-hidden="true">&larr;</span> Back</button>
+      <button class="btn" data-nav="next">Next: Final check <span aria-hidden="true">&rarr;</span></button>
+    </div>
+  </section>
+
+  <!-- STEP 7: Retrieval quiz -->
+  <section class="step" id="step-7" data-step="7" aria-labelledby="step-7-title">
+    <p class="eyebrow">Step 7 of 7 · Check your understanding</p>
+    <h2 id="step-7-title">Quick quiz</h2>
+    <p>Answer these three questions to check what you remember. Choose one answer for each.</p>
+
+    <form id="quiz-form">
+      <fieldset class="practice-item">
+        <legend>1. How many times can <code>::</code> appear in one IPv6 address?</legend>
+        <div class="mc-option"><input type="radio" name="q1" id="q1a" value="wrong"><label for="q1a">As many times as needed</label></div>
+        <div class="mc-option"><input type="radio" name="q1" id="q1b" value="correct"><label for="q1b">Exactly one time</label></div>
+        <div class="mc-option"><input type="radio" name="q1" id="q1c" value="wrong"><label for="q1c">Only at the very start</label></div>
+      </fieldset>
+
+      <fieldset class="practice-item">
+        <legend>2. Which group correctly drops its leading zero?</legend>
+        <div class="mc-option"><input type="radio" name="q2" id="q2a" value="wrong"><label for="q2a"><code>2010 → 201</code></label></div>
+        <div class="mc-option"><input type="radio" name="q2" id="q2b" value="correct"><label for="q2b"><code>00a1 → a1</code></label></div>
+        <div class="mc-option"><input type="radio" name="q2" id="q2c" value="wrong"><label for="q2c"><code>0000 → (nothing)</code></label></div>
+      </fieldset>
+
+      <fieldset class="practice-item">
+        <legend>3. Why is <code>2001::db8::42</code> invalid?</legend>
+        <div class="mc-option"><input type="radio" name="q3" id="q3a" value="wrong"><label for="q3a">There are too many hex digits</label></div>
+        <div class="mc-option"><input type="radio" name="q3" id="q3b" value="correct"><label for="q3b">A computer could not tell how many zero groups each <code>::</code> stands for</label></div>
+        <div class="mc-option"><input type="radio" name="q3" id="q3c" value="wrong"><label for="q3c">Colons are not allowed next to letters</label></div>
+      </fieldset>
+
+      <button type="button" class="btn accent" id="quiz-submit">Check my quiz</button>
+    </form>
+
+    <p class="feedback" id="quiz-feedback" role="status" aria-live="polite"></p>
+
+    <div class="card" id="quiz-result-card" style="display:none;">
+      <p class="final-score" id="final-score"></p>
+      <p style="margin-bottom:0;">You have covered both IPv6 compression rules: dropping leading zeros,
+        and replacing one run of all-zero groups with <code>::</code>. Review any step above at any time
+        using the step list at the top of the page.</p>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn secondary" data-nav="prev"><span aria-hidden="true">&larr;</span> Back</button>
+      <span></span>
+    </div>
+  </section>
+
+</main>
+
+<div aria-live="polite" class="sr-only" id="step-announcer"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  var steps = Array.prototype.slice.call(document.querySelectorAll(".step"));
+  var totalSteps = steps.length;
+  var currentStep = 1;
+  var completed = {};
+  var progressList = document.getElementById("progress-list");
+  var announcer = document.getElementById("step-announcer");
+
+  var stepTitles = [
+    "Get started", "Rule 1", "Rule 2", "Worked example",
+    "Your turn", "Expanding", "Quiz"
+  ];
+
+  // Build progress nav
+  stepTitles.forEach(function (title, i) {
+    var num = i + 1;
+    var li = document.createElement("li");
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.textContent = num + ". " + title;
+    btn.setAttribute("data-goto", String(num));
+    if (num === 1) btn.setAttribute("aria-current", "step");
+    btn.addEventListener("click", function () { goToStep(num); });
+    li.appendChild(btn);
+    progressList.appendChild(li);
+  });
+
+  function updateProgressNav() {
+    var btns = progressList.querySelectorAll("button");
+    btns.forEach(function (btn, idx) {
+      var num = idx + 1;
+      if (num === currentStep) {
+        btn.setAttribute("aria-current", "step");
+      } else {
+        btn.removeAttribute("aria-current");
+      }
+      if (completed[num]) {
+        btn.classList.add("completed");
+      }
+    });
+  }
+
+  function goToStep(n) {
+    if (n < 1 || n > totalSteps) return;
+    completed[currentStep] = true;
+    currentStep = n;
+    steps.forEach(function (sec) {
+      sec.classList.toggle("active", Number(sec.getAttribute("data-step")) === n);
+    });
+    updateProgressNav();
+    announcer.textContent = "Step " + n + " of " + totalSteps + ": " + stepTitles[n - 1];
+    var activeSection = document.getElementById("step-" + n);
+    if (activeSection) {
+      activeSection.setAttribute("tabindex", "-1");
+      activeSection.focus({ preventScroll: false });
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }
+
+  document.querySelectorAll("[data-nav]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var dir = btn.getAttribute("data-nav");
+      goToStep(dir === "next" ? currentStep + 1 : currentStep - 1);
+    });
+  });
+
+  updateProgressNav();
+
+  // Dyslexia-friendly toggle
+  document.getElementById("dyslexia-toggle").addEventListener("change", function (e) {
+    document.body.classList.toggle("dyslexia-mode", e.target.checked);
+  });
+
+  // ---------- Signature interactive: compression press ----------
+  var pressFull = ["2001", "0db8", "0000", "0000", "0000", "ff00", "0042", "8329"];
+  var pressStage = document.getElementById("press-stage");
+  var pressCaption = document.getElementById("press-caption");
+  var pressBtn = document.getElementById("press-btn");
+  var pressResetBtn = document.getElementById("press-reset-btn");
+  var pressState = 0; // 0 = initial, 1 = leading zeros dropped, 2 = compressed
+
+  function renderPress() {
+    pressStage.innerHTML = "";
+    if (pressState === 0) {
+      pressFull.forEach(function (grp, i) {
+        var span = document.createElement("span");
+        span.className = "fold";
+        span.textContent = grp + (i < pressFull.length - 1 ? ":" : "");
+        pressStage.appendChild(span);
+      });
+    } else if (pressState === 1) {
+      var trimmed = ["2001", "db8", "0", "0", "0", "ff00", "42", "8329"];
+      trimmed.forEach(function (grp, i) {
+        var span = document.createElement("span");
+        span.className = "fold";
+        if (grp === "0") span.style.color = "var(--user-accent)";
+        span.textContent = grp + (i < trimmed.length - 1 ? ":" : "");
+        pressStage.appendChild(span);
+      });
+    } else {
+      var final = ["2001", "db8", "::", "ff00", "42", "8329"];
+      final.forEach(function (grp, i) {
+        var span = document.createElement("span");
+        span.className = "fold";
+        var isColon = grp === "::";
+        span.textContent = grp + (i < final.length - 1 && !isColon && final[i+1] !== "::" ? ":" : (isColon ? "" : ""));
+        if (isColon) {
+          span.classList.add("colon-collapsed");
+          span.textContent = "::";
+        } else if (i < final.length - 1 && final[i + 1] !== "::") {
+          span.textContent = grp + ":";
+        } else {
+          span.textContent = grp;
+        }
+        pressStage.appendChild(span);
+      });
+    }
+  }
+  renderPress();
+
+  pressBtn.addEventListener("click", function () {
+    if (pressState === 0) {
+      pressState = 1;
+      renderPress();
+      pressCaption.textContent = "Rule 1 applied: leading zeros dropped in each group.";
+      pressBtn.textContent = "Compress further";
+    } else if (pressState === 1) {
+      pressState = 2;
+      renderPress();
+      pressCaption.textContent = "Rule 2 applied: the three all-zero groups are replaced with \"::\".";
+      pressBtn.disabled = true;
+    }
+  });
+
+  pressResetBtn.addEventListener("click", function () {
+    pressState = 0;
+    pressBtn.disabled = false;
+    pressBtn.textContent = "Compress it";
+    pressCaption.textContent = "Press \"Compress it\" to begin.";
+    renderPress();
+  });
+
+  // ---------- Practice answer checking ----------
+  var answers = {
+    practice1: "ff02::1",
+    practice2: "2001:0:0:34::59",
+    practice3: "2001:0db8:0000:0000:0000:0000:0000:0001"
+  };
+
+  function normalize(str) {
+    return str.trim().toLowerCase().replace(/\s+/g, "");
+  }
+
+  document.querySelectorAll("[data-check]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var key = btn.getAttribute("data-check");
+      var input = document.getElementById(key + "-input");
+      var feedback = document.getElementById(key + "-feedback");
+      var userVal = normalize(input.value);
+      var correctVal = normalize(answers[key]);
+      feedback.classList.remove("correct", "incorrect");
+      feedback.classList.add("show");
+      if (userVal === correctVal) {
+        feedback.classList.add("correct");
+        feedback.textContent = "Correct! " + answers[key] + " is right.";
+      } else if (userVal.length === 0) {
+        feedback.classList.add("incorrect");
+        feedback.textContent = "Type an answer first, then check again.";
+      } else {
+        feedback.classList.add("incorrect");
+        feedback.textContent = "Not quite. Select \"Show reasoning\" for help, then try again.";
+      }
+    });
+  });
+
+  document.querySelectorAll("[data-hint-toggle]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var target = document.getElementById(btn.getAttribute("data-hint-toggle"));
+      var isHidden = target.style.display === "none" || !target.style.display;
+      target.style.display = isHidden ? "block" : "none";
+      btn.textContent = isHidden ? "Hide reasoning" : "Show reasoning";
+    });
+  });
+
+  // ---------- Quiz ----------
+  document.getElementById("quiz-submit").addEventListener("click", function () {
+    var feedback = document.getElementById("quiz-feedback");
+    var questions = ["q1", "q2", "q3"];
+    var answered = questions.every(function (q) {
+      return document.querySelector('input[name="' + q + '"]:checked');
+    });
+
+    feedback.classList.remove("correct", "incorrect");
+    feedback.classList.add("show");
+
+    if (!answered) {
+      feedback.classList.add("incorrect");
+      feedback.textContent = "Please answer all three questions before checking.";
+      return;
+    }
+
+    var score = 0;
+    questions.forEach(function (q) {
+      var checked = document.querySelector('input[name="' + q + '"]:checked');
+      if (checked && checked.value === "correct") score++;
+    });
+
+    feedback.classList.add("correct");
+    feedback.textContent = "You answered " + score + " out of 3 correctly.";
+
+    var resultCard = document.getElementById("quiz-result-card");
+    var finalScore = document.getElementById("final-score");
+    finalScore.textContent = "Score: " + score + " / 3";
+    resultCard.style.display = "block";
+  });
+
+})();
+</script>
+</body>
+</html>
