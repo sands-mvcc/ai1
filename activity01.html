@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Random Call — Student Spinner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0B1220;
+    --panel: #121B2E;
+    --panel-2: #0F1728;
+    --border: #223049;
+    --text: #E7EDF6;
+    --muted: #8593AD;
+    --cyan: #55C9E8;
+    --amber: #F2A65A;
+    --seg-a: #17325A;
+    --seg-b: #1F4066;
+    --seg-picked: #16202F;
+    --danger: #E36969;
+    --radius: 14px;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    min-height: 100vh;
+  }
+
+  body {
+    background-image:
+      linear-gradient(rgba(85,201,232,0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(85,201,232,0.035) 1px, transparent 1px);
+    background-size: 32px 32px;
+    background-position: center;
+  }
+
+  .wrap {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 32px 24px 64px;
+  }
+
+  header {
+    margin-bottom: 32px;
+  }
+
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    letter-spacing: 0.14em;
+    color: var(--cyan);
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .eyebrow::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--cyan);
+    box-shadow: 0 0 8px var(--cyan);
+    display: inline-block;
+  }
+
+  h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: clamp(28px, 4vw, 42px);
+    margin: 0 0 8px;
+    letter-spacing: -0.01em;
+  }
+
+  header p {
+    color: var(--muted);
+    margin: 0;
+    font-size: 14px;
+    max-width: 560px;
+    line-height: 1.6;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.85fr);
+    gap: 28px;
+    align-items: start;
+  }
+
+  @media (max-width: 860px) {
+    .layout { grid-template-columns: 1fr; }
+  }
+
+  /* ---------- WHEEL PANEL ---------- */
+
+  .wheel-panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+  }
+
+  .wheel-stage {
+    position: relative;
+    width: 100%;
+    max-width: 440px;
+    aspect-ratio: 1 / 1;
+    margin: 8px auto 20px;
+  }
+
+  .reticle {
+    position: absolute;
+    top: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+    width: 34px;
+    height: 34px;
+    pointer-events: none;
+  }
+  .reticle svg { width: 100%; height: 100%; display: block; }
+
+  #wheelCanvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    filter: drop-shadow(0 8px 24px rgba(0,0,0,0.45));
+    will-change: transform;
+  }
+
+  .hub-label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 78px;
+    height: 78px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 2px solid var(--cyan);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    color: var(--cyan);
+    text-align: center;
+    line-height: 1.3;
+    pointer-events: none;
+    z-index: 4;
+    box-shadow: 0 0 0 4px var(--bg), 0 0 18px rgba(85,201,232,0.35);
+  }
+
+  .controls-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  button {
+    font-family: 'JetBrains Mono', monospace;
+    cursor: pointer;
+    border-radius: 9px;
+    font-size: 13px;
+    letter-spacing: 0.02em;
+    transition: transform 0.12s ease, background 0.15s ease, border-color 0.15s ease;
+  }
+  button:active { transform: scale(0.97); }
+  button:focus-visible {
+    outline: 2px solid var(--cyan);
+    outline-offset: 2px;
+  }
+
+  .btn-primary {
+    background: var(--cyan);
+    color: #06121C;
+    border: none;
+    font-weight: 700;
+    padding: 14px 30px;
+    font-size: 14px;
+    box-shadow: 0 0 0 rgba(85,201,232,0.4);
+  }
+  .btn-primary:hover:not(:disabled) { background: #6ed4f0; }
+  .btn-primary:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    padding: 10px 16px;
+  }
+  .btn-ghost:hover { border-color: var(--cyan); color: var(--cyan); }
+
+  .result-readout {
+    margin-top: 20px;
+    width: 100%;
+    min-height: 64px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--panel-2);
+    padding: 14px 18px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+  }
+  .result-readout .label {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .result-readout .name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--amber);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .result-readout .name::after {
+    content: "";
+    width: 9px;
+    height: 20px;
+    background: var(--amber);
+    animation: blink 1s steps(2) infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+  .result-readout.empty .name {
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .result-readout.empty .name::after { display: none; }
+
+  /* ---------- CONSOLE PANEL ---------- */
+
+  .console {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .console-tab {
+    background: var(--panel-2);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 18px;
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .console-tab span.file { color: var(--cyan); }
+  .console-body { padding: 20px; }
+
+  .field-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    color: var(--muted);
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .upload-zone {
+    border: 1.5px dashed var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 18px;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .upload-zone.dragover {
+    border-color: var(--cyan);
+    background: rgba(85,201,232,0.06);
+  }
+  .upload-zone p {
+    margin: 0 0 12px;
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .upload-zone input[type=file] { display: none; }
+
+  textarea#rosterInput {
+    width: 100%;
+    min-height: 150px;
+    resize: vertical;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    padding: 12px 14px;
+    line-height: 1.6;
+    margin-bottom: 12px;
+  }
+  textarea#rosterInput:focus-visible { outline: 2px solid var(--cyan); outline-offset: 1px; }
+
+  .action-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-top: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--text);
+  }
+  .toggle-row .hint { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+
+  .switch {
+    position: relative;
+    width: 42px;
+    height: 24px;
+    flex-shrink: 0;
+  }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .switch .track {
+    position: absolute; inset: 0;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    transition: background 0.15s ease, border-color .15s ease;
+    cursor: pointer;
+  }
+  .switch .track::before {
+    content: "";
+    position: absolute;
+    height: 16px; width: 16px;
+    left: 3px; top: 50%;
+    transform: translateY(-50%);
+    background: var(--muted);
+    border-radius: 50%;
+    transition: transform 0.15s ease, background 0.15s ease;
+  }
+  .switch input:checked + .track { border-color: var(--cyan); background: rgba(85,201,232,0.12); }
+  .switch input:checked + .track::before { transform: translate(18px, -50%); background: var(--cyan); }
+
+  .roster-list {
+    margin-top: 16px;
+    border-top: 1px solid var(--border);
+    padding-top: 14px;
+  }
+  .roster-list .count {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    max-height: 180px;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+  .chip {
+    font-size: 12px;
+    padding: 5px 10px;
+    border-radius: 6px;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    white-space: nowrap;
+  }
+  .chip.picked {
+    color: var(--muted);
+    text-decoration: line-through;
+    border-color: var(--border);
+    opacity: 0.55;
+  }
+
+  .error-msg {
+    font-size: 12px;
+    color: var(--danger);
+    margin: -4px 0 12px;
+    min-height: 16px;
+  }
+
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    #wheelCanvas { transition-duration: 0.6s !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">roster --spin --no-repeat</div>
+    <h1>Random Call</h1>
+    <p>Upload your class roster, spin the wheel, and get a name — no favorites, no repeats until everyone's had a turn.</p>
+  </header>
+
+  <div class="layout">
+
+    <!-- WHEEL -->
+    <section class="wheel-panel">
+      <div class="wheel-stage">
+        <div class="reticle" aria-hidden="true">
+          <svg viewBox="0 0 34 34">
+            <line x1="17" y1="0" x2="17" y2="34" stroke="#F2A65A" stroke-width="2"/>
+            <line x1="0" y1="17" x2="34" y2="17" stroke="#F2A65A" stroke-width="2"/>
+            <circle cx="17" cy="17" r="10" fill="none" stroke="#F2A65A" stroke-width="2"/>
+            <circle cx="17" cy="17" r="2.3" fill="#F2A65A"/>
+          </svg>
+        </div>
+        <canvas id="wheelCanvas" width="600" height="600"></canvas>
+        <div class="hub-label">SPIN<br>TO<br>SELECT</div>
+      </div>
+
+      <div class="controls-row">
+        <button class="btn-primary" id="spinBtn">Spin the wheel</button>
+        <button class="btn-ghost" id="resetPoolBtn">Reset pool</button>
+      </div>
+
+      <div class="result-readout empty" id="resultReadout">
+        <span class="label">Selected</span>
+        <span class="name" id="resultName">Awaiting spin…</span>
+      </div>
+    </section>
+
+    <!-- CONSOLE -->
+    <aside class="console">
+      <div class="console-tab">
+        <span class="file">roster.csv</span>
+        <span id="rosterCountTab">0 students</span>
+      </div>
+      <div class="console-body">
+
+        <div class="upload-zone" id="dropZone">
+          <p>Drop a .txt or .csv file here (one name per line, or comma-separated),<br>or choose a file below.</p>
+          <input type="file" id="fileInput" accept=".txt,.csv">
+          <button class="btn-ghost" id="chooseFileBtn" type="button">Choose file</button>
+          <button class="btn-ghost" id="loadDefaultBtn" type="button">Load sample roster</button>
+        </div>
+
+        <label class="field-label" for="rosterInput">Edit roster (one name per line)</label>
+        <textarea id="rosterInput" spellcheck="false" placeholder="Alex Chen&#10;Priya Patel&#10;Jordan Smith"></textarea>
+        <div class="error-msg" id="errorMsg"></div>
+
+        <div class="action-row">
+          <button class="btn-primary" id="applyBtn" style="padding:11px 20px;">Update wheel</button>
+          <button class="btn-ghost" id="clearBtn" type="button">Clear all</button>
+        </div>
+
+        <div class="toggle-row">
+          <div>
+            <div>Avoid repeats</div>
+            <div class="hint">Picked students are skipped until you reset the pool</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="avoidRepeatsToggle" checked>
+            <span class="track"></span>
+          </label>
+        </div>
+
+        <div class="roster-list">
+          <div class="count">
+            <span>Current roster</span>
+            <span id="pickedCount">0 picked</span>
+          </div>
+          <div class="chips" id="chipsContainer"></div>
+        </div>
+
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<script>
+(function(){
+  const DEFAULT_ROSTER = [
+    "Alex Chen","Priya Patel","Jordan Smith","Maria Garcia","Liam O'Connor",
+    "Aisha Khan","Noah Kim","Sofia Rossi","Ethan Brooks","Mia Nguyen",
+    "Lucas Silva","Zoe Martin"
+  ];
+
+  const SEG_COLORS = ["#17325A", "#1F4066"];
+  const SEG_TEXT = ["#9FD9EF", "#F2A65A"];
+
+  const canvas = document.getElementById('wheelCanvas');
+  const ctx = canvas.getContext('2d');
+  const spinBtn = document.getElementById('spinBtn');
+  const resetPoolBtn = document.getElementById('resetPoolBtn');
+  const resultReadout = document.getElementById('resultReadout');
+  const resultName = document.getElementById('resultName');
+  const rosterInput = document.getElementById('rosterInput');
+  const applyBtn = document.getElementById('applyBtn');
+  const clearBtn = document.getElementById('clearBtn');
+  const fileInput = document.getElementById('fileInput');
+  const chooseFileBtn = document.getElementById('chooseFileBtn');
+  const loadDefaultBtn = document.getElementById('loadDefaultBtn');
+  const dropZone = document.getElementById('dropZone');
+  const avoidRepeatsToggle = document.getElementById('avoidRepeatsToggle');
+  const chipsContainer = document.getElementById('chipsContainer');
+  const pickedCountEl = document.getElementById('pickedCount');
+  const rosterCountTab = document.getElementById('rosterCountTab');
+  const errorMsg = document.getElementById('errorMsg');
+
+  let names = [];
+  let picked = new Set();
+  let currentRotation = 0;
+  let spinning = false;
+
+  function parseRoster(text) {
+    return text
+      .split(/[\n,]/)
+      .map(s => s.trim())
+      .filter(s => s.length > 0);
+  }
+
+  function setError(msg) {
+    errorMsg.textContent = msg || '';
+  }
+
+  function loadNames(list) {
+    names = list;
+    picked = new Set();
+    rosterInput.value = names.join('\n');
+    renderAll();
+  }
+
+  function renderAll() {
+    drawWheel();
+    renderChips();
+    rosterCountTab.textContent = names.length + (names.length === 1 ? ' student' : ' students');
+    pickedCountEl.textContent = picked.size + ' picked';
+    updateSpinAvailability();
+  }
+
+  function renderChips() {
+    chipsContainer.innerHTML = '';
+    names.forEach((name, i) => {
+      const chip = document.createElement('span');
+      chip.className = 'chip' + (picked.has(i) ? ' picked' : '');
+      chip.textContent = name;
+      chipsContainer.appendChild(chip);
+    });
+  }
+
+  function availableIndices() {
+    if (!avoidRepeatsToggle.checked) {
+      return names.map((_, i) => i);
+    }
+    const avail = [];
+    names.forEach((_, i) => { if (!picked.has(i)) avail.push(i); });
+    return avail;
+  }
+
+  function updateSpinAvailability() {
+    const avail = availableIndices();
+    spinBtn.disabled = spinning || names.length < 2 || avail.length === 0;
+    if (names.length >= 2 && avail.length === 0) {
+      spinBtn.textContent = 'Everyone has answered';
+    } else {
+      spinBtn.textContent = 'Spin the wheel';
+    }
+  }
+
+  function truncate(str, max) {
+    return str.length > max ? str.slice(0, max - 1) + '…' : str;
+  }
+
+  function drawWheel() {
+    const size = canvas.width;
+    const cx = size / 2, cy = size / 2;
+    const radius = size / 2 - 6;
+    ctx.clearRect(0, 0, size, size);
+
+    if (names.length === 0) {
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+      ctx.fillStyle = '#101A2C';
+      ctx.fill();
+      ctx.strokeStyle = '#223049';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.fillStyle = '#8593AD';
+      ctx.font = '20px "JetBrains Mono", monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('Upload a roster to begin', cx, cy);
+      return;
+    }
+
+    const n = names.length;
+    const segAngle = (Math.PI * 2) / n;
+    const fontSize = n > 24 ? 13 : n > 16 ? 16 : n > 10 ? 19 : 23;
+
+    for (let i = 0; i < n; i++) {
+      const start = -Math.PI / 2 + i * segAngle;
+      const end = start + segAngle;
+
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.arc(cx, cy, radius, start, end);
+      ctx.closePath();
+      ctx.fillStyle = picked.has(i) ? '#16202F' : SEG_COLORS[i % 2];
+      ctx.fill();
+      ctx.strokeStyle = '#0B1220';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // tick mark near rim
+      ctx.save();
+      ctx.strokeStyle = 'rgba(85,201,232,0.25)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(cx + Math.cos(start) * (radius - 2), cy + Math.sin(start) * (radius - 2));
+      ctx.lineTo(cx + Math.cos(start) * (radius - 14), cy + Math.sin(start) * (radius - 14));
+      ctx.stroke();
+      ctx.restore();
+
+      // label
+      const mid = start + segAngle / 2;
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(mid);
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = picked.has(i) ? '#54607A' : SEG_TEXT[i % 2];
+      ctx.font = (picked.has(i) ? '' : '600 ') + fontSize + 'px "JetBrains Mono", monospace';
+      const maxChars = Math.max(6, Math.floor((radius * 0.62) / (fontSize * 0.58)));
+      ctx.fillText(truncate(names[i], maxChars), radius - 18, 0);
+      ctx.restore();
+    }
+
+    // outer rim
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+    ctx.strokeStyle = '#2E4468';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+  }
+
+  function pickWinnerIndex() {
+    const avail = availableIndices();
+    return avail[Math.floor(Math.random() * avail.length)];
+  }
+
+  function spin() {
+    if (spinning || names.length < 2) return;
+    const avail = availableIndices();
+    if (avail.length === 0) return;
+
+    spinning = true;
+    setError('');
+    spinBtn.disabled = true;
+    resultReadout.classList.remove('empty');
+    resultName.textContent = 'Spinning…';
+
+    const winnerIndex = pickWinnerIndex();
+    const n = names.length;
+    const segAngleDeg = 360 / n;
+    const segCenterDeg = winnerIndex * segAngleDeg + segAngleDeg / 2;
+    const targetMod = ((360 - segCenterDeg) % 360 + 360) % 360;
+
+    const extraSpins = 6 + Math.floor(Math.random() * 3); // 6-8 full turns
+    const baseFloor = currentRotation - (currentRotation % 360);
+    let newRotation = baseFloor + extraSpins * 360 + targetMod;
+    while (newRotation <= currentRotation) newRotation += 360;
+    currentRotation = newRotation;
+
+    canvas.style.transition = 'transform 4.4s cubic-bezier(0.15, 0.7, 0.1, 1)';
+    canvas.style.transform = 'rotate(' + currentRotation + 'deg)';
+
+    const onEnd = () => {
+      canvas.removeEventListener('transitionend', onEnd);
+      spinning = false;
+      picked.add(winnerIndex);
+      resultReadout.classList.remove('empty');
+      resultName.textContent = names[winnerIndex];
+      renderChips();
+      pickedCountEl.textContent = picked.size + ' picked';
+      updateSpinAvailability();
+      drawWheel(); // repaint so picked segment dims — rotation transform persists visually
+      canvas.style.transition = 'none';
+      canvas.style.transform = 'rotate(' + currentRotation + 'deg)';
+      // force reflow so next spin's transition re-applies cleanly
+      void canvas.offsetWidth;
+    };
+    canvas.addEventListener('transitionend', onEnd);
+  }
+
+  function resetPool() {
+    picked = new Set();
+    resultReadout.classList.add('empty');
+    resultName.textContent = 'Awaiting spin…';
+    renderAll();
+  }
+
+  // ---- events ----
+
+  spinBtn.addEventListener('click', spin);
+  resetPoolBtn.addEventListener('click', resetPool);
+
+  applyBtn.addEventListener('click', () => {
+    const parsed = parseRoster(rosterInput.value);
+    if (parsed.length === 0) {
+      setError('Add at least one name before updating the wheel.');
+      return;
+    }
+    setError('');
+    loadNames(parsed);
+    resultReadout.classList.add('empty');
+    resultName.textContent = 'Awaiting spin…';
+  });
+
+  clearBtn.addEventListener('click', () => {
+    rosterInput.value = '';
+    setError('');
+    loadNames([]);
+    resultReadout.classList.add('empty');
+    resultName.textContent = 'Awaiting spin…';
+  });
+
+  loadDefaultBtn.addEventListener('click', () => {
+    setError('');
+    loadNames(DEFAULT_ROSTER.slice());
+    resultReadout.classList.add('empty');
+    resultName.textContent = 'Awaiting spin…';
+  });
+
+  avoidRepeatsToggle.addEventListener('change', updateSpinAvailability);
+
+  chooseFileBtn.addEventListener('click', () => fileInput.click());
+
+  fileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) readFile(file);
+  });
+
+  function readFile(file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const parsed = parseRoster(e.target.result);
+      if (parsed.length === 0) {
+        setError('That file didn\'t contain any names. Check the format and try again.');
+        return;
+      }
+      setError('');
+      loadNames(parsed);
+      resultReadout.classList.add('empty');
+      resultName.textContent = 'Awaiting spin…';
+    };
+    reader.onerror = () => setError('Couldn\'t read that file. Try a plain .txt or .csv file.');
+    reader.readAsText(file);
+  }
+
+  ['dragenter', 'dragover'].forEach(evt => {
+    dropZone.addEventListener(evt, (e) => {
+      e.preventDefault();
+      dropZone.classList.add('dragover');
+    });
+  });
+  ['dragleave', 'drop'].forEach(evt => {
+    dropZone.addEventListener(evt, (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+    });
+  });
+  dropZone.addEventListener('drop', (e) => {
+    const file = e.dataTransfer.files[0];
+    if (file) readFile(file);
+  });
+
+  // ---- init: load default roster for demo purposes ----
+  loadNames(DEFAULT_ROSTER.slice());
+})();
+</script>
+
+</body>
+</html>
