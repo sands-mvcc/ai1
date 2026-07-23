@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI in Cybersecurity - Prof. Jiri | Moraine Valley CC</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            900: '#14532d',
+                        },
+                        cyber: {
+                            bg: '#f8fafc',
+                            card: '#ffffff',
+                            border: '#e2e8f0',
+                            accent: '#0284c7'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;600&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+        }
+
+        .code-font {
+            font-family: 'Fira Code', monospace;
+        }
+
+        .glow-emerald {
+            box-shadow: 0 4px 20px -2px rgba(16, 185, 129, 0.12);
+        }
+
+        .glow-emerald:hover {
+            box-shadow: 0 10px 25px -3px rgba(16, 185, 129, 0.22);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between custom-scrollbar selection:bg-brand-100 selection:text-brand-900">
+
+    <div>
+        <header class="border-b border-slate-200 bg-white/90 backdrop-blur-md sticky top-0 z-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="h-10 w-10 rounded-lg bg-gradient-to-br from-brand-600 to-cyber-accent flex items-center justify-center text-white font-bold text-xl shadow-md">
+                        <i class="fa-solid font-mono fa-shield-halved"></i>
+                    </div>
+                    <div>
+                        <div class="font-extrabold text-slate-900 text-lg tracking-tight flex items-center gap-2">
+                            MORAINE VALLEY <span class="text-xs px-2 py-0.5 rounded bg-brand-50 text-brand-700 border border-brand-200 font-bold">CYBERSECURITY</span>
+                        </div>
+                        <p class="text-xs text-slate-500 font-medium">Department of Computer Integrated Technologies</p>
+                    </div>
+                </div>
+                <div class="hidden md:flex items-center space-x-6 text-sm text-slate-600 font-medium">
+                    <span class="flex items-center gap-2">
+                        <i class="fa-solid fa-user-tie text-brand-600"></i> Prof. Jiri
+                    </span>
+                    <span class="flex items-center gap-2">
+                        <i class="fa-solid fa-microchip text-cyber-accent"></i> Applied AI & Security
+                    </span>
+                </div>
+            </div>
+        </header>
+
+        <section class="relative overflow-hidden border-b border-slate-200 bg-gradient-to-b from-slate-100 via-emerald-50/40 to-slate-50 py-12 lg:py-16">
+            <div class="absolute inset-0 opacity-20 bg-[radial-gradient(#16a34a_1px,transparent_1px)] [background-size:16px_16px]"></div>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <div class="max-w-3xl">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-brand-100 text-brand-800 border border-brand-200 mb-4">
+                        <span class="w-2 h-2 rounded-full bg-brand-600 animate-pulse"></span>
+                        Course Lab Portal & Dynamic Exercises
+                    </div>
+                    <h1 class="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight mb-4">
+                        Artificial Intelligence in <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-cyber-accent">Cybersecurity</span>
+                    </h1>
+                    <p class="text-slate-600 text-base sm:text-lg mb-6 leading-relaxed font-normal">
+                        Welcome to the interactive lab repository for Prof. Jiri's Cybersecurity curriculum at Moraine Valley CC. Access hands-on activities covering prompt injection defense, AI log analysis, threat intelligence, and adversarial machine learning.
+                    </p>
+
+                    <!-- Stats & Progress Bar -->
+                    <div class="bg-white border border-slate-200 shadow-sm rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div class="flex items-center gap-4 w-full sm:w-auto">
+                            <div class="text-center sm:text-left">
+                                <span class="text-xs text-slate-500 block uppercase font-semibold">Total Modules</span>
+                                <span class="text-xl font-bold text-slate-900 code-font">10 Activities</span>
+                            </div>
+                            <div class="h-8 w-px bg-slate-200 hidden sm:block"></div>
+                            <div class="text-center sm:text-left">
+                                <span class="text-xs text-slate-500 block uppercase font-semibold">Lab Progress</span>
+                                <span id="progressPercent" class="text-xl font-bold text-brand-600 code-font">0% Completed</span>
+                            </div>
+                        </div>
+
+                        <!-- Progress indicator -->
+                        <div class="w-full sm:w-48 bg-slate-100 rounded-full h-2.5 overflow-hidden border border-slate-200">
+                            <div id="progressBar" class="bg-gradient-to-r from-brand-500 to-cyber-accent h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+            <!-- Filter Bar -->
+            <div class="flex flex-col md:flex-row gap-4 items-center justify-between mb-8">
+                <!-- Search Box -->
+                <div class="relative w-full md:w-96">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                    <input type="text" id="searchInput" placeholder="Search activity title, keyword, or topic..." 
+                           class="w-full bg-white border border-slate-200 text-sm text-slate-900 rounded-xl pl-10 pr-4 py-2.5 shadow-sm focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all placeholder:text-slate-400">
+                </div>
+
+                <!-- Category Filters -->
+                <div class="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 custom-scrollbar" id="categoryFilters">
+                    <button data-category="all" class="filter-btn active px-3.5 py-2 rounded-lg text-xs font-semibold whitespace-nowrap bg-brand-600 text-white shadow-sm transition-all">
+                        All Activities
+                    </button>
+                    <button data-category="Defense" class="filter-btn px-3.5 py-2 rounded-lg text-xs font-semibold whitespace-nowrap bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50 transition-all shadow-sm">
+                        Defensive AI
+                    </button>
+                    <button data-category="Prompting" class="filter-btn px-3.5 py-2 rounded-lg text-xs font-semibold whitespace-nowrap bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50 transition-all shadow-sm">
+                        Prompt Security
+                    </button>
+                    <button data-category="Threats" class="filter-btn px-3.5 py-2 rounded-lg text-xs font-semibold whitespace-nowrap bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50 transition-all shadow-sm">
+                        Threat Modeling
+                    </button>
+                    <button data-category="Governance" class="filter-btn px-3.5 py-2 rounded-lg text-xs font-semibold whitespace-nowrap bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50 transition-all shadow-sm">
+                        Ethics & Policy
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+                    <i class="fa-solid fa-list-check text-brand-600"></i> Course Modules
+                </h2>
+                <span id="activityCounter" class="text-xs text-slate-500 code-font font-medium">Showing 10 of 10</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="activityGrid">
+                <!-- Activities will be populated dynamically -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="noResults" class="hidden text-center py-16 bg-white rounded-2xl border border-slate-200 shadow-sm">
+                <i class="fa-solid fa-filter-circle-xmark text-4xl text-slate-300 mb-3"></i>
+                <h3 class="text-lg font-semibold text-slate-800">No activities found</h3>
+                <p class="text-sm text-slate-500 mt-1">Try adjusting your search query or filter selection.</p>
+            </div>
+        </main>
+    </div>
+
+    <footer class="border-t border-slate-200 bg-white py-8 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="h-8 w-8 rounded-lg bg-brand-50 border border-brand-200 flex items-center justify-center text-brand-600">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <div>
+                    <span class="text-sm font-semibold text-slate-900">Moraine Valley Community College</span>
+                    <p class="text-xs text-slate-500">Cybersecurity Program &bull; Prof. Jiri</p>
+                </div>
+            </div>
+            <p class="text-xs text-slate-500 text-center md:text-right">
+                Designed for AI & Cybersecurity Education &bull; <span id="currentYear"></span>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Activity Data Configuration
+        const activities = [
+            {
+                id: "01",
+                file: "activity01.html",
+                title: "Intro to Machine Learning in Cyber Defense",
+                description: "Explore the core fundamentals of AI models, anomaly detection algorithms, and baseline defensive setups.",
+                category: "Defense",
+                icon: "fa-brain",
+                tags: ["ML Fundamentals", "Anomaly Detection"]
+            },
+            {
+                id: "02",
+                file: "activity02.html",
+                title: "Adversarial Prompt Injection & Defense",
+                description: "Analyze direct and indirect prompt vulnerabilities in LLMs and engineer secure input system prompts.",
+                category: "Prompting",
+                icon: "fa-terminal",
+                tags: ["Prompt Injection", "LLM Security"]
+            },
+            {
+                id: "03",
+                file: "activity03.html",
+                title: "Automated SIEM Log Analysis with LLMs",
+                description: "Build an automated workflow utilizing language models to analyze, parse, and summarize security logs.",
+                category: "Defense",
+                icon: "fa-receipt",
+                tags: ["SIEM", "Log Parsing"]
+            },
+            {
+                id: "04",
+                file: "activity04.html",
+                title: "AI-Driven Phishing Email Classification",
+                description: "Train and test Natural Language Processing models to detect synthetic social engineering attacks.",
+                category: "Threats",
+                icon: "fa-envelope-open-text",
+                tags: ["Social Engineering", "NLP"]
+            },
+            {
+                id: "05",
+                file: "activity05.html",
+                title: "Data Poisoning Attacks & Remediation",
+                description: "Simulate training data manipulation scenarios and build data validation pipelines against model drift.",
+                category: "Threats",
+                icon: "fa-flask",
+                tags: ["Data Integrity", "Model Poisoning"]
+            },
+            {
+                id: "06",
+                file: "activity06.html",
+                title: "Building Secure LLM Guardrails & Filters",
+                description: "Implement real-time content filtering, regex wrappers, and safety classifiers for enterprise AI endpoints.",
+                category: "Prompting",
+                icon: "fa-shield-cat",
+                tags: ["Guardrails", "Input Sanitization"]
+            },
+            {
+                id: "07",
+                file: "activity07.html",
+                title: "Malware Code Deobfuscation with Copilots",
+                description: "Leverage AI code assistants safely to deconstruct obfuscated scripts and extract IOC signatures.",
+                category: "Defense",
+                icon: "fa-bug-slash",
+                tags: ["Reverse Engineering", "IOC Extraction"]
+            },
+            {
+                id: "08",
+                file: "activity08.html",
+                title: "Model Inversion & Data Extraction Risks",
+                description: "Explore privacy leakage, training data extraction techniques, and differential privacy solutions.",
+                category: "Threats",
+                icon: "fa-user-ninja",
+                tags: ["Privacy Leakage", "Model Theft"]
+            },
+            {
+                id: "09",
+                file: "activity09.html",
+                title: "Autonomous Incident Response Playbooks",
+                description: "Formulate AI-assisted incident response routines to isolate compromised nodes and generate reports.",
+                category: "Defense",
+                icon: "fa-bolt",
+                tags: ["Incident Response", "Automation"]
+            },
+            {
+                id: "10",
+                file: "activity10.html",
+                title: "AI Risk Governance & Ethical Frameworks",
+                description: "Apply NIST AI Risk Management Frameworks (AI RMF) and establish compliance checklists for deployment.",
+                category: "Governance",
+                icon: "fa-scale-balanced",
+                tags: ["NIST Framework", "AI Ethics"]
+            }
+        ];
+
+        // State Management
+        let activeCategory = 'all';
+        let searchQuery = '';
+        let completedActivities = JSON.parse(localStorage.getItem('jiri_completed_activities') || '{}');
+
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        // Render Cards Function
+        function renderGrid() {
+            const grid = document.getElementById('activityGrid');
+            const noResults = document.getElementById('noResults');
+            grid.innerHTML = '';
+
+            const filtered = activities.filter(act => {
+                const matchesCat = activeCategory === 'all' || act.category === activeCategory;
+                const matchesSearch = act.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                                      act.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                      act.tags.some(t => t.toLowerCase().includes(searchQuery.toLowerCase()));
+                return matchesCat && matchesSearch;
+            });
+
+            document.getElementById('activityCounter').textContent = `Showing ${filtered.length} of ${activities.length}`;
+
+            if (filtered.length === 0) {
+                noResults.classList.remove('hidden');
+                return;
+            } else {
+                noResults.classList.add('hidden');
+            }
+
+            filtered.forEach(act => {
+                const isCompleted = !!completedActivities[act.id];
+                
+                const card = document.createElement('div');
+                card.className = `group bg-white border ${isCompleted ? 'border-brand-500 shadow-sm' : 'border-slate-200'} rounded-2xl p-6 hover:border-brand-500 transition-all duration-300 flex flex-col justify-between hover:-translate-y-1 glow-emerald relative shadow-sm`;
+
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="code-font text-xs font-bold px-2.5 py-1 rounded-md bg-slate-100 text-slate-700 border border-slate-200">
+                                ACTIVITY ${act.id}
+                            </span>
+                            <div class="flex items-center gap-2">
+                                <label class="flex items-center cursor-pointer text-xs text-slate-500 hover:text-slate-900 transition-colors" title="Toggle Completion">
+                                    <input type="checkbox" data-id="${act.id}" class="toggle-complete form-checkbox h-4 w-4 text-brand-600 rounded bg-slate-100 border-slate-300 focus:ring-0 focus:ring-offset-0 mr-1.5 cursor-pointer" ${isCompleted ? 'checked' : ''}>
+                                    <span class="${isCompleted ? 'text-brand-600 font-semibold' : ''}">${isCompleted ? 'Done' : 'Mark Complete'}</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-3 mb-3">
+                            <div class="p-2.5 rounded-xl bg-slate-100 border border-slate-200 text-brand-600 group-hover:bg-brand-600 group-hover:text-white transition-colors">
+                                <i class="fa-solid ${act.icon} text-lg"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-slate-900 group-hover:text-brand-600 transition-colors leading-snug">
+                                ${act.title}
+                            </h3>
+                        </div>
+
+                        <p class="text-sm text-slate-600 mb-5 leading-relaxed">
+                            ${act.description}
+                        </p>
+                    </div>
+
+                    <div>
+                        <div class="flex flex-wrap gap-1.5 mb-5">
+                            ${act.tags.map(tag => `<span class="text-[11px] px-2 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200 font-medium">${tag}</span>`).join('')}
+                        </div>
+
+                        <a href="${act.file}" class="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl font-semibold text-sm bg-brand-600 text-white hover:bg-brand-700 transition-colors shadow-md">
+                            <span>Launch Exercise</span>
+                            <i class="fa-solid fa-arrow-right text-xs transition-transform group-hover:translate-x-1"></i>
+                        </a>
+                    </div>
+                `;
+
+                grid.appendChild(card);
+            });
+
+            // Bind checkbox events
+            document.querySelectorAll('.toggle-complete').forEach(chk => {
+                chk.addEventListener('change', (e) => {
+                    const id = e.target.getAttribute('data-id');
+                    if (e.target.checked) {
+                        completedActivities[id] = true;
+                    } else {
+                        delete completedActivities[id];
+                    }
+                    localStorage.setItem('jiri_completed_activities', JSON.stringify(completedActivities));
+                    updateProgress();
+                    renderGrid();
+                });
+            });
+        }
+
+        function updateProgress() {
+            const completedCount = Object.keys(completedActivities).length;
+            const percentage = Math.round((completedCount / activities.length) * 100);
+            
+            document.getElementById('progressPercent').textContent = `${percentage}% Completed`;
+            document.getElementById('progressBar').style.width = `${percentage}%`;
+        }
+
+        // Event Listeners for Filters and Search
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            searchQuery = e.target.value;
+            renderGrid();
+        });
+
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.filter-btn').forEach(b => {
+                    b.classList.remove('bg-brand-600', 'text-white', 'active');
+                    b.classList.add('bg-white', 'text-slate-600', 'border', 'border-slate-200', 'hover:bg-slate-50');
+                });
+
+                e.target.classList.remove('bg-white', 'text-slate-600', 'border', 'border-slate-200', 'hover:bg-slate-50');
+                e.target.classList.add('bg-brand-600', 'text-white', 'active');
+
+                activeCategory = e.target.getAttribute('data-category');
+                renderGrid();
+            });
+        });
+
+        // Initialize Page
+        updateProgress();
+        renderGrid();
+    </script>
+</body>
+</html>
